@@ -1,0 +1,10 @@
+{
+    "resolution_time": 30,
+    "handlers": [
+        "handlers.redis_handler.RedisHandler"
+    ],
+    "redis": {
+        "host": "localhost",
+        "pw": ""
+    }
+}
