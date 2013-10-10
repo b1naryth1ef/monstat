@@ -25,8 +25,6 @@ class Master(object):
             except ImportError, e:
                 print e
 
-        schedule.every(self.config.get("resolution_time", 60)).seconds.do(self.update)
-
     def get_redis(self):
         red = self.config.get("redis")
         if not red:
@@ -47,13 +45,13 @@ class Master(object):
         for metric in self.metrics.values():
             metric()
 
-    def loop(self):
-        while True:
-            time.sleep(1)
-            schedule.run_pending()
-
     def register_metric(self, name, call_back):
         self.metrics[name] = call_back
+
+    def loop(self):
+        while True:
+            time.sleep(self.config.get("resolution_time", 60))
+            self.update()
 
 if __name__ == "__main__":
     m = Master()

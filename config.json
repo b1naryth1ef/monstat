@@ -1,10 +1,17 @@
 {
     "resolution_time": 30,
     "handlers": [
-        "handlers.redis_handler.RedisHandler"
+        "handlers.redis_handler.RedisHandler",
+        "handlers.mongo_handler.MongoHandler"
     ],
     "redis": {
         "host": "localhost",
         "pw": ""
+    },
+    "MongoHandler": {
+        "host": "localhost",
+        "pw": "",
+        "dbs": ["trukme", "local"],
+        "objs": ["storageSize", "objects", "avgObjSize"]
     }
 }

@@ -23,6 +23,7 @@ class GraphManager(object):
     def addStat(self, stat):
         self.stats.append(stat)
         stat.init(self)
+        return stat
 
     def rmvStat(self, stat):
         self.stats.remove(stat)
@@ -37,16 +38,41 @@ class GraphManager(object):
             return getattr(self.getStat(name), funcname)(*args, **kwargs)
         return get
 
+class MultiGraph(object):
+    def __init__(self, name, graphs):
+        self.name = name
+        self.graphs = {i.name: i for i in graphs.values()}
+
+        for k in ["incr", "get", "set", "graph", "clear", "set_at", "incr_at", "boolean", "boolean_at", "variation", "average"]:
+            self.__dict__[k] = self.smart_get(k)
+
+    def init(self, manager):
+        for i in self.graphs.values():
+            i.init(manager)
+
+    def smart_get(self, funcname):
+        def get(*args, **kwargs):
+            result = {}
+            for n, g in self.graphs.items():
+                result[n] = getattr(g, funcname)(*args, **kwargs)
+            return result
+        return get
+
 class Graph(object):
     def __init__(self, name, archive_time=30, formatter=int, boolean=False):
         self.name = name
         self.archive = archive_time
-        self.formatter = formatter
+        self._formatter = formatter
         self.isboolean = boolean
 
         self.key = "stat.%s" % self.name
         self.red = None
         self.manager = None
+
+    # hack
+    def formatter(self, i):
+        if i:
+            return self._formatter(i)
 
     def init(self, manager):
         self.manager = None
@@ -121,7 +147,7 @@ class Graph(object):
         result = []
         for dt in rrule(by, count=count, dtstart=start):
             k = get_keys(self.key, dt)[kid]
-            result.append([dt, self.formatter(self.red.get(k) or 0)])
+            result.append([dt, self.formatter(self.red.get(k))])
 
         return result
 

@@ -80,6 +80,10 @@ var options = {
   }
 
 function renderGraph(id, data) {
+    if (!$('#'+id).length) {
+        $("#add").append('<div class="row-fluid graph" id="'+id+'"></div>')
+    }
+    var id = $('#'+id)
     var opt = $.extend({}, options);
     var series = []
     $.each(data, function (i, v) {

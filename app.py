@@ -2,6 +2,7 @@ from flask import Flask, render_template
 from flask_sockets import Sockets
 
 from master import Master
+from utils.grapher import MultiGraph
 
 import thread, time, json
 import datetime
@@ -32,14 +33,14 @@ def get_stats():
     for stat in m.graphs.stats:
         print "Graphing %s" % stat.name
         data = {
-            'id': "#"+stat.name,
-            'series': [
-                {
-                    "name": stat.name,
-                    "data": stat.graph("hour", start=datetime.datetime.now())
-                }
-            ]
+            'id': stat.name,
+            'series': []
         }
+        if isinstance(stat, MultiGraph):
+            data['series'] = [{"name": k, "data": v} for k, v in stat.graph("hour", start=datetime.datetime.now()).items()]
+        else:
+            data['series'] = [{"name": stat.name, "data": stat.graph("hour", start=datetime.datetime.now())}]
+
         test['graphs'].append(data)
     return json.dumps(test, default=dthandler)
 
