@@ -39,6 +39,7 @@ def get_stats():
         if isinstance(stat, MultiGraph):
             data['series'] = [{"name": k, "data": v} for k, v in stat.graph("hour", start=datetime.datetime.now()).items()]
         else:
+            if not stat.parent: continue
             data['series'] = [{"name": stat.name, "data": stat.graph("hour", start=datetime.datetime.now())}]
 
         test['graphs'].append(data)

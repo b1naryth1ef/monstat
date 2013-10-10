@@ -3,9 +3,14 @@ from dateutil.rrule import *
 
 #stat.name.YEAR.DAY.HOUR.MINUTE
 base_key = "{key}.{d.year}.{d.day}.{d.hour}.{d.minute}"
+
+# Averages a list
 average = lambda l: reduce(lambda x, y: x + y, l) / float(len(l))
 
 def get_keys(key, dt):
+    """
+    Returns a list of recursive date formated keys based on base_key.
+    """
     res = []
     key = base_key.format(key=key, d=dt).split(".")
     for i in range(0, len(key)):
@@ -13,6 +18,9 @@ def get_keys(key, dt):
     return res
 
 class GraphManager(object):
+    """
+    Manages a collection of graphs for easy access
+    """
     def __init__(self, redis):
         self.redis = redis
         self.stats = []
@@ -39,6 +47,9 @@ class GraphManager(object):
         return get
 
 class MultiGraph(object):
+    """
+    Combines multiple graphs for use in a series graph
+    """
     def __init__(self, name, graphs):
         self.name = name
         self.graphs = {i.name: i for i in graphs.values()}
@@ -48,6 +59,7 @@ class MultiGraph(object):
 
     def init(self, manager):
         for i in self.graphs.values():
+            i.parent = False
             i.init(manager)
 
     def smart_get(self, funcname):
@@ -59,6 +71,10 @@ class MultiGraph(object):
         return get
 
 class Graph(object):
+    """
+    A graph support setting, incrementing, and eventually getting
+    data in the form of a time-series graph
+    """
     def __init__(self, name, archive_time=30, formatter=int, boolean=False):
         self.name = name
         self.archive = archive_time
@@ -68,6 +84,7 @@ class Graph(object):
         self.key = "stat.%s" % self.name
         self.red = None
         self.manager = None
+        self.parent = True
 
     # hack
     def formatter(self, i):
