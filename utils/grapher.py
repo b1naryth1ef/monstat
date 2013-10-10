@@ -52,7 +52,9 @@ class MultiGraph(object):
     """
     def __init__(self, name, graphs):
         self.name = name
-        self.graphs = {i.name: i for i in graphs.values()}
+        if isinstance(graphs, dict):
+            graphs = graphs.values()
+        self.graphs = {i.name: i for i in graphs}
 
         for k in ["incr", "get", "set", "graph", "clear", "set_at", "incr_at", "boolean", "boolean_at", "variation", "average"]:
             self.__dict__[k] = self.smart_get(k)
@@ -75,8 +77,9 @@ class Graph(object):
     A graph support setting, incrementing, and eventually getting
     data in the form of a time-series graph
     """
-    def __init__(self, name, archive_time=30, formatter=int, boolean=False):
+    def __init__(self, name, archive_time=30, formatter=float, boolean=False, diff=True, alias=None):
         self.name = name
+        self.alias = alias
         self.archive = archive_time
         self._formatter = formatter
         self.isboolean = boolean
@@ -85,6 +88,8 @@ class Graph(object):
         self.red = None
         self.manager = None
         self.parent = True
+        self.diff = diff
+        self.last = None
 
     # hack
     def formatter(self, i):
@@ -100,6 +105,8 @@ class Graph(object):
 
     def set(self, val, verbose=False):
         if verbose: print "Setting %s to %s at %s" % (self.name, val, datetime.now())
+        self.last = val
+
         self.set_at(datetime.now(), val)
 
     def graph_util(self, graph_type, start=None):

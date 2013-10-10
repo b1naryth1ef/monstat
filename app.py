@@ -51,7 +51,7 @@ def socket(ws):
     while True:
         data = get_stats()
         ws.send(data)
-        time.sleep(30)
+        time.sleep(15)  # This value should change depending on how much load you want on your redis-db
 
 @app.route('/')
 def hello():

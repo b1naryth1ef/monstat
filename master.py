@@ -1,4 +1,4 @@
-import schedule, time, json
+import time, json
 import os, sys, redis
 
 from utils.grapher import GraphManager
@@ -50,7 +50,7 @@ class Master(object):
 
     def loop(self):
         while True:
-            time.sleep(self.config.get("resolution_time", 60))
+            time.sleep(self.config.get("resolution_time", 30))
             self.update()
 
 if __name__ == "__main__":
