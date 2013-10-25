@@ -2,7 +2,8 @@
     "resolution_time": 30,
     "handlers": [
         "handlers.redis_handler.RedisHandler",
-        "handlers.mongo_handler.MongoHandler"
+        "handlers.mongo_handler.MongoHandler",
+        "handlers.sys_handler.SysHandler"
     ],
     "redis": {
         "host": "localhost",
@@ -11,7 +12,17 @@
     "MongoHandler": {
         "host": "localhost",
         "pw": "",
-        "dbs": ["trukme", "local"],
+        "dbs": ["trukme", "local", "spoton", "hotspot"],
         "objs": ["storageSize", "objects", "avgObjSize"]
+    },
+    "SysHandler": {
+        "hosts": [
+            {"host": "localhost", "user": "andrei"}
+        ],
+        "metrics": [
+            "load",
+            "memory",
+            "disk"
+        ]
     }
 }

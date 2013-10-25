@@ -59,7 +59,13 @@ class MultiGraph(object):
         for k in ["incr", "get", "set", "graph", "clear", "set_at", "incr_at", "boolean", "boolean_at", "variation", "average"]:
             self.__dict__[k] = self.smart_get(k)
 
+    def add(self, graph):
+        self.graphs[graph.name] = graph
+        graph.parent = False
+        graph.init(self.manager)
+
     def init(self, manager):
+        self.manager = manager
         for i in self.graphs.values():
             i.parent = False
             i.init(manager)
@@ -171,6 +177,7 @@ class Graph(object):
         result = []
         for dt in rrule(by, count=count, dtstart=start):
             k = get_keys(self.key, dt)[kid]
+            print k
             result.append([dt, self.formatter(self.red.get(k))])
 
         return result

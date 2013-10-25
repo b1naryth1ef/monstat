@@ -25,6 +25,25 @@ class Master(object):
             except ImportError, e:
                 print e
 
+    def alert(self, namespace, text, t="warning"):
+        self.get_redis().lpush("alert."+namespace, json.dumps({
+            "text": text,
+            "type": t,
+            "space": namespace
+        }))
+
+    def rmv_alerts(self, namespace):
+        for k in self.get_redis().keys("alert."+namespace+"*"):
+            self.get_redis().delete(k)
+
+    def get_alerts(self, namespace=None):
+        key = "alert."+(namespace if namespace else "")+"*"
+        results = []
+        for k in self.get_redis().keys(key):
+            for value in self.get_reds().lrange(k, 0, -1):
+                results.append(json.loads(value))
+        return results
+
     def get_redis(self):
         red = self.config.get("redis")
         if not red:

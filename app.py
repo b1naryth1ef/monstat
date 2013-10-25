@@ -37,10 +37,11 @@ def get_stats():
             'series': []
         }
         if isinstance(stat, MultiGraph):
-            data['series'] = [{"name": k, "data": v} for k, v in stat.graph("hour", start=datetime.datetime.now()).items()]
+            print stat.graphs
+            data['series'] = [{"name": k, "data": v} for k, v in stat.graph("week", start=datetime.datetime.now()).items()]
         else:
             if not stat.parent: continue
-            data['series'] = [{"name": stat.name, "data": stat.graph("hour", start=datetime.datetime.now())}]
+            data['series'] = [{"name": stat.name, "data": stat.graph("week", start=datetime.datetime.now())}]
 
         test['graphs'].append(data)
     return json.dumps(test, default=dthandler)
@@ -55,10 +56,10 @@ def socket(ws):
 
 @app.route('/')
 def hello():
+    m.update()
     return render_template("index.html")
 
 
 if __name__ == "__main__":
     app.run(debug=True)
-
 
